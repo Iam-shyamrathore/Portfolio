@@ -17,6 +17,11 @@ const spaceMono = Space_Mono({
 export const metadata = {
   title: "Shyam | Product Engineer",
   description: "Portfolio of Shyam, a Product Engineer building autonomous systems.",
+  icons: {
+    icon: "/images/myiamge.jpeg",
+    shortcut: "/images/myiamge.jpeg",
+    apple: "/images/myiamge.jpeg",
+  },
 };
 
 export default function RootLayout({

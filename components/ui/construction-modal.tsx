@@ -7,8 +7,26 @@ interface ConstructionModalProps {
   onClose: () => void;
 }
 
+import { createPortal } from 'react-dom';
+import { useEffect, useState } from 'react';
+
 export const ConstructionModal = ({ isOpen, onClose }: ConstructionModalProps) => {
-  return (
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // Prevent scrolling when modal is open
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [isOpen]);
+
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -18,7 +36,7 @@ export const ConstructionModal = ({ isOpen, onClose }: ConstructionModalProps) =
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 min-h-screen" // Added min-h-screen and z-[100]
           >
             {/* Modal */}
             <motion.div
@@ -70,6 +88,7 @@ export const ConstructionModal = ({ isOpen, onClose }: ConstructionModalProps) =
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };

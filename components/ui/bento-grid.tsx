@@ -67,7 +67,7 @@ export const BentoGridItem = ({
 
   if (href) {
     return (
-        <Link href={href} className={containerClasses}>
+        <Link href={href} target="_blank" rel="noopener noreferrer" className={containerClasses}>
           <motion.div whileHover={{ y: -5 }} className="h-full flex flex-col justify-between">
             <CardContent />
           </motion.div>

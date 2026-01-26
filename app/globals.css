@@ -1,26 +1,38 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: #F5F5F7;  /* Off-white */
+  --color-foreground: #111111;  /* Stark Black */
+  
+  --color-swiss-red: #FF3B30;
+  --color-swiss-blue: #002FA7; /* International Klein Blue */
+  
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-space-mono);
+
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: #F5F5F7;
+  --foreground: #111111;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  letter-spacing: -0.02em; /* Tight typography for Swiss feel */
+}
+
+/* Custom Utilities for Bento Grids */
+@layer utilities {
+  .bento-card {
+    @apply bg-white rounded-3xl p-6 transition-all duration-300 hover:shadow-lg border border-gray-100;
+  }
+  
+  .text-balance {
+    text-wrap: balance;
+  }
 }

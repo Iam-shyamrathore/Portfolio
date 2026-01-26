@@ -32,7 +32,7 @@ export default function Home() {
       ),
       icon: <BrainCircuit className="h-4 w-4 text-[#002FA7]" />,
       className: "md:col-span-2 bg-white",
-      href: "https://graph-skill-infrence.vercel.app"
+      href: "https://siingithub.vercel.app/"
     },
     {
       title: "MAANG Route",

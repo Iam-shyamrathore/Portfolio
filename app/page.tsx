@@ -90,7 +90,7 @@ export default function Home() {
                 </p>
                 
                 <div className="flex gap-4 items-center">
-                    <a href="/resume/Shyam_resume.pdf" target="_blank" className="bg-[#002FA7] text-white font-bold py-3 px-6 rounded-full hover:bg-[#002FA7]/90 transition-colors flex items-center gap-2 group">
+                    <a href="/api/resume" target="_blank" className="bg-[#002FA7] text-white font-bold py-3 px-6 rounded-full hover:bg-[#002FA7]/90 transition-colors flex items-center gap-2 group">
                         RESUME < ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                     </a>
                 </div>

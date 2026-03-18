@@ -10,7 +10,7 @@ export async function GET() {
     status: 200,
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": 'inline; filename="Shyam_resume.pdf"',
+      "Content-Disposition": 'attachment; filename="Shyam_resume.pdf"',
       "Content-Length": fileBuffer.byteLength.toString(),
       "Cache-Control": "public, max-age=3600",
     },

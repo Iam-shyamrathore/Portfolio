@@ -35,6 +35,7 @@ export function ProjectRow({
         </div>
         <ArrowUpRight size={16} aria-hidden="true" />
       </Link>
+      {project.liveSite&&<a className="project-row-live" href={project.liveSite.url} target="_blank" rel="noreferrer" aria-label={`Visit ${project.name} live website`}>Live site <ArrowUpRight size={12} aria-hidden="true"/></a>}
     </li>
   );
 }

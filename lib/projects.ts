@@ -13,6 +13,7 @@ export type Project = {
   relatedPost?: string;
   takeaway: string;
   links?: { label: string; href: string }[];
+  liveSite?: { url: string; embeddable: boolean; previewImage?: string };
 };
 export const projects: Project[] = [
   {
@@ -60,12 +61,17 @@ export const projects: Project[] = [
     "takeaway": "I start with a concrete failure path, trace it across services, and put a test at the point where the system previously lost its guarantee.",
     "links": [
       {
-        "label": "YoLearn.ai",
-        "href": "https://yolearn.ai"
+        "label": "Live website",
+        "href": "https://yolearn.ai/"
       }
     ],
     "verification": "These changes are backed by authored commits and regression cases in the gateway, generation service, and web client. Company source stays private.",
-    "relatedPost": "a-stream-is-not-the-work"
+    "relatedPost": "a-stream-is-not-the-work",
+    "liveSite": {
+      "url": "https://yolearn.ai/",
+      "embeddable": false,
+      "previewImage": "https://www.yolearn.ai/og_image.png"
+    }
   },
   {
     "slug": "previo",
@@ -106,12 +112,16 @@ export const projects: Project[] = [
     "takeaway": "For an agent that changes state, the proposal, validation result, and applied revision are separate artifacts. That separation makes review and undo practical.",
     "links": [
       {
-        "label": "Product website",
-        "href": "https://previo.tech"
+        "label": "Live website",
+        "href": "https://previo.tech/"
       }
     ],
     "verification": "Authored patch-engine tests cover stale and cross-scope requests, connected-node removal, inverse restoration, and typed failures. Previo remains in development.",
-    "relatedPost": "let-the-agent-propose"
+    "relatedPost": "let-the-agent-propose",
+    "liveSite": {
+      "url": "https://previo.tech/",
+      "embeddable": true
+    }
   },
   {
     "slug": "apcan",
@@ -150,6 +160,10 @@ export const projects: Project[] = [
     "takeaway": "I want the interface to distinguish “the assistant replied” from “the requested action completed.” Voice makes that distinction easier to overlook, so the surrounding workflow must make it explicit.",
     "links": [
       {
+        "label": "Live website",
+        "href": "https://apcan-eight.vercel.app/"
+      },
+      {
         "label": "Source & change history",
         "href": "https://github.com/Iam-shyamrathore/APCAN"
       },
@@ -158,7 +172,11 @@ export const projects: Project[] = [
         "href": "https://github.com/Iam-shyamrathore/APCAN/commit/0ec3f779ec0544c2388a846d86a9018b3dc3d51f"
       }
     ],
-    "verification": "The public history contains agent-failure, conversation-history, audit-sanitization, and rate-limit tests. The latest cockpit and model-factory changes are visible in the linked source."
+    "verification": "The public history contains agent-failure, conversation-history, audit-sanitization, and rate-limit tests. The latest cockpit and model-factory changes are visible in the linked source.",
+    "liveSite": {
+      "url": "https://apcan-eight.vercel.app/",
+      "embeddable": true
+    }
   },
   {
     "slug": "prachaar",
@@ -234,6 +252,10 @@ export const projects: Project[] = [
     "takeaway": "A useful inference needs both an evidence trail and a readable interface. I treat uncertainty and visualization as parts of the same explanation.",
     "links": [
       {
+        "label": "Live website",
+        "href": "https://siingithub.vercel.app/"
+      },
+      {
         "label": "Manuscript & study limits",
         "href": "/research"
       },
@@ -246,7 +268,11 @@ export const projects: Project[] = [
         "href": "https://github.com/Iam-shyamrathore/graph-skill-infrence/commit/36e3ad0736fdce4253cc5f97f79bcb988106202c"
       }
     ],
-    "verification": "The public graph-centering commit can be inspected directly. The manuscript and source are linked together; the paper remains unpublished."
+    "verification": "The public graph-centering commit can be inspected directly. The manuscript and source are linked together; the paper remains unpublished.",
+    "liveSite": {
+      "url": "https://siingithub.vercel.app/",
+      "embeddable": true
+    }
   },
   {
     "slug": "maangroute",
@@ -283,12 +309,16 @@ export const projects: Project[] = [
     "takeaway": "I try to define the identity and owner of a record before designing the dashboard that displays it.",
     "links": [
       {
-        "label": "Product website",
-        "href": "https://maangroute.dev"
+        "label": "Live website",
+        "href": "https://www.maangroute.dev/"
       }
     ],
     "verification": "Authored history includes the feed integration and authentication hardening. The schema and server actions define the ownership and daily-record rules.",
-    "relatedPost": "choose-what-your-database-remembers"
+    "relatedPost": "choose-what-your-database-remembers",
+    "liveSite": {
+      "url": "https://www.maangroute.dev/",
+      "embeddable": false
+    }
   },
   {
     "slug": "speechee",
@@ -326,7 +356,17 @@ export const projects: Project[] = [
     ],
     "takeaway": "Keeping a screen mounted changes more than its animation. I now review its initial state and side effects whenever I change a navigation transition.",
     "verification": "The navigation and empty-session fixes are authored commits. The current validator was checked against the repository; the later matching change is attributed to the team.",
-    "relatedPost": "forgiving-speech-interfaces"
+    "relatedPost": "forgiving-speech-interfaces",
+    "liveSite": {
+      "url": "https://speechee-website.vercel.app/",
+      "embeddable": true
+    },
+    "links": [
+      {
+        "label": "Live website",
+        "href": "https://speechee-website.vercel.app/"
+      }
+    ]
   },
   {
     "slug": "nanograd",

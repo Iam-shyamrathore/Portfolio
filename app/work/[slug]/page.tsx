@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { projects } from "@/lib/projects";
 import Image from "next/image";
+import { ProjectSitePreview } from "@/components/project-site-preview";
 export function generateStaticParams() {
   return projects.map(({ slug }) => ({ slug }));
 }
@@ -52,7 +53,7 @@ export default async function ProjectPage({
           ))}
         </div>
       </header>
-      <figure className="project-cover">
+      {project.liveSite?<ProjectSitePreview project={project}/>:<figure className="project-cover">
         <Image
           src={`/projects/${project.slug}.webp`}
           alt={`Concept illustration for ${project.name}`}
@@ -61,7 +62,7 @@ export default async function ProjectPage({
           priority
         />
         <figcaption>Concept illustration · {project.name}</figcaption>
-      </figure>
+      </figure>}
       <div className="case-body">
         <aside>
           <h2>Tools & systems</h2>

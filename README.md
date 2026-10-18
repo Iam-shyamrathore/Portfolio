@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Shyam Rathore · Portfolio
 
-## Getting Started
+Next.js App Router, React, TypeScript, and Tailwind CSS v4. Project stories, a Markdown notebook, research, real GitHub contribution data, photographs, and a reversible black-hole interaction with an interactive generated desk scene.
 
-First, run the development server:
+## Run locally
 
-```bash
+```sh
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open the printed local URL. `npm run build` creates the production build; `npm start` serves it. No database or admin account is needed.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Publish a blog post
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Add a Markdown file to `content/blog/`, locally or through GitHub's Add file UI. Its filename becomes its URL: `my-next-note.md` becomes `/blog/my-next-note`.
 
-## Learn More
+```markdown
+---
+title: "My next note"
+description: "A short description for the index and search."
+date: "2026-10-18"
+category: "System design"
+draft: false
+---
 
-To learn more about Next.js, take a look at the following resources:
+Start writing here.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## A useful heading
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Markdown links, images, code blocks, lists, and tables work.
+```
 
-## Deploy on Vercel
+Categories: `System design`, `Databases`, `Agents`, `Product thinking`. Quote dates. Use lowercase, hyphenated filenames. Set `draft: true` to exclude a post from the index, direct routes, RSS, and sitemap. Builds validate published metadata and fail on invalid files. Raw HTML and executable MDX are not enabled.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Commit and redeploy to publish. Files are read at build time; there is no upload endpoint. The six initial posts are newly written engineering notes grounded in reviewed source and authored commits, not historical entries. Company examples are paraphrased; private source stays outside the portfolio. Reading time is calculated. RSS lives at `/feed.xml`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Update work and research
+
+- Edit `lib/projects.ts` for project copy, categories, stack, and public links. Case-study pages generate automatically.
+- Edit `app/research/page.tsx` for the manuscript summary. The paper is `public/research/siin-manuscript.pdf`; replace its preview if the paper changes.
+- The selected resume is `public/resume/Shyam_Rathore_AI_Engineer.pdf`.
+- Photos are in `public/photos/`; original generated artwork is in `public/art/` and `public/projects/`. Project images are conceptual illustrations, not product screenshots.
+- `components/ui/minimal.tsx` integrates the supplied ASCII recipe. TypeScript, Tailwind, `@/` aliases, `components/ui/`, and `lib/utils.ts` already exist. `components.json` declares shadcn-compatible paths; no migration is needed.
+
+## GitHub activity
+
+`data/github.json` is a real GraphQL contribution snapshot. `data/profile.json` contains public repository totals and the sum of stars on original public repositories. The sync command refreshes both. The interface labels the snapshot date. No private repository names or activity details are stored.
+
+Refresh with the existing GitHub CLI login:
+
+```sh
+npm run github:sync
+```
+
+Commit and redeploy to update the graph and profile totals. For hourly server-side contribution refresh, set optional server-only `GITHUB_TOKEN` before building. Requests fall back to the dated snapshot on failure. Profile stars and repository counts use the dated snapshot until the next CLI sync. No token enters the browser. `/api/github` serves the contribution data. Both snapshots work without credentials.
+
+## Hosting and metadata
+
+Set `SITE_URL` to the canonical address before deployment (default `https://shyam.codes`). See `.env.example`. It controls RSS, metadata, robots, and sitemap URLs. Use a supported Next.js host. This local redesign does not alter the live website until deployed.
+
+## Verify
+
+```sh
+npm run lint
+npm run build
+```
+
+Check desktop/mobile navigation, project filters, blog search and subject filters, paper/resume links, contribution dates, and black-hole restore/Escape behavior. Test reduced motion. `docs/design.md` records the direction, content boundaries, image prompts, and credits.

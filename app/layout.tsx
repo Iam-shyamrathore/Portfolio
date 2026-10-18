@@ -1,41 +1,40 @@
-import { Inter, Space_Mono } from "next/font/google";
+import type { Metadata } from "next";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { AmbientBackground } from "@/components/ambient-background";
 import "./globals.css";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const spaceMono = Space_Mono({
-  variable: "--font-space-mono",
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  display: "swap",
-});
-
-export const metadata = {
-  title: "Shyam | Product Engineer",
-  description: "Portfolio of Shyam, a Product Engineer building autonomous systems.",
-  icons: {
-    icon: "/images/myiamge.jpeg",
-    shortcut: "/images/myiamge.jpeg",
-    apple: "/images/myiamge.jpeg",
+export const metadata: Metadata = {
+  metadataBase: new URL(process.env.SITE_URL || "https://shyam.codes"),
+  title: {
+    default: "Shyam Rathore · Engineer & builder",
+    template: "%s · Shyam Rathore",
   },
+  description:
+    "AI systems, thoughtful products, and the engineering in between. Selected work and field notes by Shyam Rathore.",
+  openGraph: {
+    title: "Shyam Rathore · Engineer & builder",
+    description:
+      "AI systems, thoughtful products, and the engineering in between.",
+    images: [{ url: "/art/blue-sky.webp", width: 2172, height: 724 }],
+  },
+  twitter: { card: "summary_large_image" },
+  alternates: { types: { "application/rss+xml": "/feed.xml" } },
 };
-
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body
-        suppressHydrationWarning
-        className={`${inter.variable} ${spaceMono.variable} antialiased bg-[#F5F5F7] text-[#111111]`}
-      >
-        {children}
+    <html lang="en" data-scroll-behavior="smooth">
+      <body>
+        <a className="skip-link" href="#main">
+          Skip to content
+        </a>
+        <div className="site-world">
+          <AmbientBackground />
+          <Header />
+          {children}
+          <Footer />
+        </div>
       </body>
     </html>
   );

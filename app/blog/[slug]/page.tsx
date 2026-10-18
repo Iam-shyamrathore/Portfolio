@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Markdown from "react-markdown";
+import { ContactButton } from "@/components/contact-button";
 import remarkGfm from "remark-gfm";
 import { getPost, getPosts, displayDate } from "@/lib/blog";
 export function generateStaticParams() {
@@ -50,12 +51,11 @@ export default async function PostPage({
         </article>
         <div className="article-end">
           <span>Thanks for reading.</span>
-          <a
+          <ContactButton
             className="text-link"
-            href={`mailto:shyamrathore013@gmail.com?subject=${encodeURIComponent(`A thought on: ${post.title}`)}`}
-          >
-            Let’s talk about it <ArrowUpRight size={15} aria-hidden="true" />
-          </a>
+            label="Let’s talk about it"
+            subject={`A thought on: ${post.title}`}
+          />
           <Link href="/blog" className="text-link">
             More field notes ↗
           </Link>

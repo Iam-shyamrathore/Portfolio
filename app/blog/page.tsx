@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getPosts } from "@/lib/blog";
 import { BlogExplorer } from "@/components/blog-explorer";
+import { SubscribeButton } from "@/components/subscribe-button";
 export const metadata: Metadata = {
   title: "Writing",
   description:
@@ -37,9 +38,10 @@ export default function Blog() {
         >
           @thebackendagent ↗
         </a>
-        <a className="text-link" href="/feed.xml">
-          Subscribe with RSS ↗
-        </a>
+        <SubscribeButton
+          className="text-link"
+          feedUrl={new URL("/feed.xml", process.env.SITE_URL || "https://shyam.codes").href}
+        />
       </div>
     </main>
   );

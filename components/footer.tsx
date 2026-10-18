@@ -1,5 +1,5 @@
-import Link from "next/link";
 import Image from "next/image";
+import { SubscribeButton } from "@/components/subscribe-button";
 export function Footer() {
   return (
     <footer className="site-footer">
@@ -31,7 +31,7 @@ export function Footer() {
             >
               Instagram ↗
             </a>
-            <Link href="/feed.xml">RSS</Link>
+            <SubscribeButton feedUrl={new URL("/feed.xml", process.env.SITE_URL || "https://shyam.codes").href} />
           </div>
         </div>
       </div>

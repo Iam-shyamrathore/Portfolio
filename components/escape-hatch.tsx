@@ -1,125 +1,109 @@
 "use client";
-import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import { createPortal } from "react-dom";
-import Image from "next/image";
-import { Lightbulb, RotateCcw } from "lucide-react";
+import {useCallback,useEffect,useRef,useState} from 'react';
+import {createPortal} from 'react-dom';
+import {RotateCcw} from 'lucide-react';
+import {DeskScene} from './desk-scene';
+import {BlackHoleIcon} from './black-hole-icon';
+import {captureAmbient} from '@/lib/capture-ambient';
+import {requestCanvasFrame} from '@/lib/capture-frame';
+import {capturePage} from '@/lib/capture-page';
 
-function DeskScene() {
-  const [lit, setLit] = useState(true);
-  const [turn, setTurn] = useState(0);
-  const surface = useRef<HTMLButtonElement>(null);
-  const pointer = useRef({ x: 0, moved: false, dragging: false });
-  function reducedMotion() {
-    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  }
-  function move(event: PointerEvent<HTMLButtonElement>) {
-    if (reducedMotion()) return;
-    const box = event.currentTarget.getBoundingClientRect();
-    const x = Math.max(-1, Math.min(1, (event.clientX - box.left) / box.width * 2 - 1));
-    const y = Math.max(-1, Math.min(1, (event.clientY - box.top) / box.height * 2 - 1));
-    event.currentTarget.style.setProperty("--desk-y", `${x * 12}deg`);
-    event.currentTarget.style.setProperty("--desk-x", `${y * -5}deg`);
-    if (pointer.current.dragging && Math.abs(event.clientX - pointer.current.x) > 5) pointer.current.moved = true;
-  }
-  function reset() {
-    surface.current?.style.setProperty("--desk-y", "0deg");
-    surface.current?.style.setProperty("--desk-x", "0deg");
-  }
-  return (
-    <>
-      <button
-        ref={surface}
-        className={`desk-surface ${lit ? "desk-lit" : ""}`}
-        style={{ "--desk-turn": `${turn}deg` } as CSSProperties}
-        aria-label="Desk scene. Move or drag to tilt; press to switch the lamp. Left and right arrow keys tilt the scene."
-        aria-pressed={lit}
-        onPointerMove={move}
-        onPointerDown={(event) => {
-          pointer.current = { x: event.clientX, moved: false, dragging: true };
-          event.currentTarget.setPointerCapture(event.pointerId);
-        }}
-        onPointerUp={() => { pointer.current.dragging = false; }}
-        onPointerCancel={() => { pointer.current.dragging = false; reset(); }}
-        onPointerLeave={reset}
-        onClick={() => {
-          if (!pointer.current.moved) setLit((value) => !value);
-          pointer.current.moved = false;
-        }}
-        onKeyDown={(event) => {
-          if (["ArrowLeft", "ArrowRight", "Home"].includes(event.key)) {
-            event.preventDefault();
-            if (reducedMotion()) return;
-            setTurn((value) => event.key === "Home" ? 0 : Math.max(-14, Math.min(14, value + (event.key === "ArrowRight" ? 4 : -4))));
-          }
-        }}
-      >
-        <span className="desk-ground" aria-hidden="true" />
-        <span className="desk-object">
-          <span className="desk-lamp-glow" aria-hidden="true" />
-          <Image src="/art/desk-miniature.webp" alt="A three-dimensional-style miniature of Shyam at a white desk with a blue laptop and lamp" width={832} height={1000} draggable={false} priority />
-        </span>
-      </button>
-      <button className="desk-lamp-control" onClick={() => setLit((value) => !value)} aria-pressed={lit}>
-        <Lightbulb size={14} aria-hidden="true" /> Lamp {lit ? "on" : "off"}
-      </button>
-      <p className="desk-hint">Move around a little. Click the desk to switch the light.</p>
-    </>
-  );
+function CollapseViewport({image,origin,onReady,onComplete,onError}:{image:HTMLCanvasElement;origin:{x:number;y:number};onReady:()=>void;onComplete:()=>void;onError:(error:unknown)=>void}){
+ const canvas=useRef<HTMLCanvasElement>(null);
+ useEffect(()=>{
+  let cancelled=false,dispose:(()=>void)|undefined;
+  import('@/lib/black-hole-engine').then(({startDestruction})=>{
+   if(cancelled||!canvas.current)return;
+   try{dispose=startDestruction(canvas.current,image,origin,onReady,onComplete);}catch(error){onError(error);}
+  }).catch(error=>{if(!cancelled)onError(error);});
+  return()=>{cancelled=true;dispose?.();};
+ },[image,origin,onReady,onComplete,onError]);
+ return <canvas className="collapse-viewport" ref={canvas} aria-hidden="true"/>;
 }
 
-export function EscapeHatch() {
-  const [stage, setStage] = useState<"idle" | "collapsing" | "quiet" | "restoring">("idle");
-  const trigger = useRef<HTMLButtonElement>(null);
-  const dialog = useRef<HTMLDialogElement>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  function finishRestore() {
-    dialog.current?.close();
-    document.documentElement.classList.remove("site-collapsing", "site-restoring");
-    setStage("idle");
-    trigger.current?.focus({ preventScroll: true });
-  }
-  function restore() {
-    if (timer.current) clearTimeout(timer.current);
-    if (stage !== "quiet" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      finishRestore();
-      return;
+type Stage='idle'|'preparing'|'collapsing'|'quiet'|'restoring';
+export function EscapeHatch(){
+ const [stage,setStage]=useState<Stage>('idle'),[hover,setHover]=useState(false),[error,setError]=useState<string|null>(null);
+ const trigger=useRef<HTMLButtonElement>(null),dialog=useRef<HTMLDialogElement>(null);
+ const timer=useRef<ReturnType<typeof setTimeout>|null>(null),request=useRef(0);
+ const [capture,setCapture]=useState<{image:HTMLCanvasElement;origin:{x:number;y:number}}|null>(null);
+ const consume=useCallback(()=>{document.documentElement.classList.add('site-consumed');},[]);
+ const finishCollapse=useCallback(()=>{consume();setStage('quiet');},[consume]);
+ const failAnimation=useCallback((reason:unknown)=>{
+  console.error('Black-hole animation could not start',reason);
+  request.current++;dialog.current?.close();setCapture(null);
+  document.documentElement.classList.remove('site-consumed','site-restoring','site-capturing');
+  setStage('idle');setError("The animation couldn't start. Please try again.");
+  trigger.current?.focus({preventScroll:true});
+ },[]);
+ function finishRestore(){
+  dialog.current?.close();setCapture(null);
+  document.documentElement.classList.remove('site-consumed','site-restoring','site-capturing');
+  setStage('idle');trigger.current?.focus({preventScroll:true});
+ }
+ function restore(){
+  request.current++;
+  if(timer.current)clearTimeout(timer.current);
+  if(stage!=='quiet'||matchMedia('(prefers-reduced-motion: reduce)').matches){finishRestore();return;}
+  setStage('restoring');document.documentElement.classList.remove('site-consumed','site-capturing');document.documentElement.classList.add('site-restoring');
+  timer.current=setTimeout(finishRestore,650);
+ }
+ useEffect(()=>()=>{
+  request.current++;
+  if(timer.current)clearTimeout(timer.current);
+  document.documentElement.classList.remove('site-consumed','site-restoring','site-capturing');
+ },[]);
+ useEffect(()=>{
+  if(stage!=='idle'&&dialog.current&&!dialog.current.open)dialog.current.showModal();
+  if(stage==='quiet')dialog.current?.querySelector<HTMLButtonElement>('.quiet-restore')?.focus();
+ },[stage]);
+ async function collapse(){
+  if(stage!=='idle')return;
+  const id=++request.current;setError(null);
+  const preview=trigger.current!.querySelector('.black-hole-preview')!.getBoundingClientRect();
+  const origin={x:preview.left+preview.width/2,y:preview.top+preview.height/2};
+  document.documentElement.classList.add('site-capturing');
+  setStage('preparing');
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){finishCollapse();return;}
+  try{
+   // Desk preloading is optional and must never cancel the destruction animation.
+   void import('@/lib/desk-model').catch(reason=>console.warn('Desk prefetch unavailable',reason));
+   const [{default:html2canvas}]=await Promise.all([import('html2canvas'),import('@/lib/black-hole-engine')]);
+   if(id!==request.current)return;
+   const world=document.querySelector<HTMLElement>('.site-world')!;
+   const image=await capturePage(()=>html2canvas(world,{
+    backgroundColor:null,scale:Math.min(devicePixelRatio,1.5),useCORS:true,logging:false,imageTimeout:1600,
+    x:0,y:scrollY,width:innerWidth,height:innerHeight,windowWidth:innerWidth,windowHeight:innerHeight,
+    ignoreElements:el=>el.classList.contains('ambient-ascii')||el.classList.contains('ambient-clouds')||el.classList.contains('ambient-control')||el.tagName==='CANVAS',
+   }),()=>captureAmbient(world));
+   // The preview is decorative; failure to copy it must not bypass the animation.
+   try{
+    const icon=trigger.current?.querySelector('canvas');
+    if(icon){
+      const rect=icon.getBoundingClientRect(),ratio=image.width/innerWidth;
+      image.getContext('2d')!.drawImage(requestCanvasFrame(icon),rect.x*ratio,rect.y*ratio,rect.width*ratio,rect.height*ratio);
     }
-    setStage("restoring");
-    document.documentElement.classList.remove("site-collapsing");
-    document.documentElement.classList.add("site-restoring");
-    timer.current = setTimeout(finishRestore, 650);
-  }
-  useEffect(() => () => {
-    if (timer.current) clearTimeout(timer.current);
-    document.documentElement.classList.remove("site-collapsing", "site-restoring");
-  }, []);
-  useEffect(() => {
-    if ((stage === "collapsing" || stage === "quiet") && dialog.current && !dialog.current.open) dialog.current.showModal();
-    if (stage === "quiet") dialog.current?.querySelector<HTMLButtonElement>(".quiet-restore")?.focus();
-  }, [stage]);
-  function collapse() {
-    if (stage !== "idle") return;
-    document.documentElement.style.setProperty("--collapse-y", `${window.scrollY + window.innerHeight / 2}px`);
-    setStage("collapsing");
-    document.documentElement.classList.add("site-collapsing");
-    timer.current = setTimeout(() => setStage("quiet"), window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1800);
-  }
-  return (
-    <>
-      <button ref={trigger} className="escape-trigger" onClick={collapse} aria-label="Collapse the website into a black hole. You can restore it afterwards.">
-        <span className="black-hole-mark" aria-hidden="true" />
-        <span>A little less internet?</span>
-      </button>
-      {stage !== "idle" && createPortal(
-        <dialog ref={dialog} className={`quiet-dialog stage-${stage}`} onCancel={(event) => { event.preventDefault(); restore(); }} aria-labelledby="quiet-title">
-          <div className="collapse-singularity" aria-hidden="true"><span /></div>
-          <div className="quiet-scene">
-            <DeskScene />
-            <h2 id="quiet-title">Just me and the next idea.</h2>
-            <button className="quiet-restore text-link" onClick={restore}><RotateCcw size={14} aria-hidden="true" /> Bring the website back</button>
-          </div>
-        </dialog>, document.body
-      )}
-    </>
-  );
+   }catch(reason){console.warn('Black-hole preview capture unavailable',reason);}
+   if(id!==request.current)return;
+   setCapture({image,origin});setStage('collapsing');
+  }catch(reason){if(id===request.current)failAnimation(reason);}
+ }
+ return <>
+  <button ref={trigger} className="escape-trigger" onClick={collapse} onPointerEnter={()=>setHover(true)} onPointerLeave={()=>setHover(false)} onFocus={()=>setHover(true)} onBlur={()=>setHover(false)} aria-label="Collapse the website into a black hole. You can restore it afterwards." aria-busy={stage==='preparing'}>
+   <BlackHoleIcon active={hover&&stage==='idle'}/>
+   <span className="escape-label">A little less internet?<small>Make some space.</small></span>
+  </button>
+  {error&&<p className="escape-error" role="alert">{error}</p>}
+  {stage!=='idle'&&createPortal(
+   <dialog ref={dialog} className={`quiet-dialog stage-${stage}`} onCancel={e=>{e.preventDefault();restore();}} aria-labelledby="quiet-title">
+    {(stage==='preparing'||stage==='collapsing')&&<button className="quiet-skip" onClick={()=>{request.current++;finishCollapse();}}>Skip animation</button>}
+    {stage==='collapsing'&&capture&&<CollapseViewport image={capture.image} origin={capture.origin} onReady={consume} onComplete={finishCollapse} onError={failAnimation}/>}
+    <div className="quiet-scene">
+     {(stage==='quiet'||stage==='restoring')&&<DeskScene/>}
+     <h2 id="quiet-title">Just me and the next idea.</h2>
+     <button className="quiet-restore text-link" onClick={restore}><RotateCcw size={14} aria-hidden="true"/>Bring the website back</button>
+    </div>
+   </dialog>,document.body
+  )}
+ </>;
 }

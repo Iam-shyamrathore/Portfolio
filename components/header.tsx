@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight } from "lucide-react";
+import { ContactButton } from "@/components/contact-button";
 export function Header() {
   const pathname = usePathname();
   return (
@@ -25,9 +25,7 @@ export function Header() {
           </Link>
         ))}
       </nav>
-      <a className="header-contact" href="mailto:shyamrathore013@gmail.com">
-        Say hello <ArrowUpRight size={14} aria-hidden="true" />
-      </a>
+      <ContactButton />
     </header>
   );
 }

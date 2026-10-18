@@ -632,7 +632,7 @@ em {
 .quiet-restore { margin-top:19px; font-size:12px; padding:10px; }
 .site-footer {
   padding-top: 50px;
-  background: #fff;
+  background: linear-gradient(to bottom, #ffffff00, #fff 110px);
 }
 .footer-invite {
   display: flex;
@@ -1177,7 +1177,7 @@ em {
   border-radius: 3px;
 }
 .photo-grid .event-photo img {
-  object-position: 22% 50%;
+  object-position: 50% 72%;
 }
 .photo-grid figcaption {
   color: var(--muted);
@@ -2067,6 +2067,7 @@ em {
  .desk-controls { gap:0; }
  .desk-controls button { padding:9px; font-size:10px; }
 }
+
 .contact-dialog {
   position:fixed;
   inset:0;
@@ -2098,6 +2099,7 @@ em {
  .site-header { height:auto; min-height:92px; padding-block:16px; }
  .contact-dialog { padding:26px 20px; }
 }
+
 .project-row-live { display:inline-flex; align-items:center; gap:5px; color:var(--blue); font-size:11px; margin: -9px 0 15px 118px; padding:4px 0; }
 .project-list-compact .project-row-live { margin-left:97px; }
 .project-site-preview { margin:0 0 48px; border:1px solid var(--line); border-radius:5px; overflow:hidden; background:#fff; }

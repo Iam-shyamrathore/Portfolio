@@ -154,7 +154,8 @@ export default function About() {
               src="/photos/cloud-event.webp"
               alt="Shyam presenting YoLearn's cloud migration at a Redington and CloudTry event held in collaboration with AWS"
               width={1500}
-              height={844}
+              height={2666}
+              sizes="(max-width:760px) calc(100vw - 40px), 460px"
             />
             <figcaption>
               Representing YoLearn at a cloud partner event, in collaboration

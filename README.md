@@ -1,6 +1,6 @@
 # Shyam Rathore · Portfolio
 
-Next.js App Router, React, TypeScript, and Tailwind CSS v4. Project stories, a Markdown notebook, research, real GitHub contribution data, photographs, and a reversible black-hole interaction with an interactive generated desk scene.
+Next.js App Router, React, TypeScript, and Tailwind CSS v4. Project stories, a Markdown notebook, research, real GitHub contribution data, photographs, and a reversible black-hole interaction with an interactive procedural Three.js desk scene.
 
 ## Run locally
 

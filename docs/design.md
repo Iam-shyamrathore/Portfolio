@@ -10,9 +10,11 @@ Primary UX references: [aligned layouts and scanning](https://www.nngroup.com/ar
 
 ## Visual world
 
-White, dark neutral ink, muted blue-gray text, and cobalt #2d5195. System sans throughout. The supplied ASCII video is the page background: invert its grayscale pixels, screen-blend them onto cobalt, and use 0.23 opacity so it reads as blue-on-white. It has a global pause control and respects reduced motion, document visibility, and intersection visibility. A panoramic halftone sky inspired by the user's reference appears in the footer. Its wide aspect ratio avoids enlarging the portrait reference's dots to fill a shallow strip.
+White, dark neutral ink, muted blue-gray text, and cobalt #2d5195. System sans throughout. The supplied ASCII video is the page background: invert its grayscale pixels, screen-blend them onto cobalt, and use 0.16 opacity so it reads as blue-on-white. It has a global pause control and respects reduced motion, document visibility, and intersection visibility. A panoramic halftone sky inspired by the user's reference appears in the footer. Its wide aspect ratio avoids enlarging the portrait reference's dots to fill a shallow strip.
 
-The reversible black-hole interaction uses an eased 1.8-second contraction and a soft scene entrance. A generated clay-style desk diorama sits in white space above a CSS ground shadow. Pointer or touch movement tilts the image in perspective; clicking or keyboard activation switches its lighting. Arrow keys provide tilt controls, and a separate lamp button is available. This is an interactive rendered image, not a rotatable 3D mesh. Restore and Escape return the website and keyboard focus. Motion is skipped under reduced motion. The dialog is portaled outside the transforming page.
+The reversible black-hole interaction captures the visible page as a texture and deforms it with a fixed-step mass/spring simulation. Anchors release as attraction increases; the page stretches into the center. A WebGL shader approximates curved light around a dark core with a blue-white accretion disk. This is an artistic approximation, not a calibrated general-relativity simulation. The button uses the same shader rather than an SVG.
+
+The quiet scene uses original procedural Three.js meshes: a seated figure with glasses and a continuous wavy hair mesh, a desk, keyboard, laptop, chair, articulated lamp, mug, and notebook. OrbitControls rotates the view, raycasting makes the lamp and laptop clickable, and keyboard/buttons provide equivalent controls. “Do push-ups” transitions to a procedural exercise rig using the same face and clothing, with fixed hands and feet and a two-segment arm solver. “Back to work” restores the desk; reduced motion shows a static plank. An overhead light and a faint radial contact shadow ground the scene. Restore and Escape return the website and keyboard focus. Reduced motion skips the destruction and suppresses idle animation. The dialog is portaled outside the page.
 
 ## Content boundaries
 
@@ -45,6 +47,20 @@ Panoramic sky prompt: panoramic cobalt-and-white halftone cumulus clouds with fi
 
 ## Desk scene replacement
 
-The built-in image-generation tool created a transparent 3D-style desk miniature, optimized to `public/art/desk-miniature.webp`. Prompt: young Indian male programmer, glasses, short wavy black hair, blue shirt, pale trousers, white desk, cobalt laptop and lamp, sculpted matte clay collectible, full seated figure and desk legs, orthographic three-quarter front view, white/cobalt palette, transparent background, no floor or baked shadow, no text or logos. The website adds a soft ground shadow, perspective tilt, and interactive lighting.
+The earlier generated desk image remains an unused asset. The active scene is built in `lib/desk-model.ts` with Three.js geometry, lighting, materials, and a canvas texture for the laptop screen. No EPS asset is used. Geometry, textures, controls, and renderers are disposed when leaving the scene.
 
-The header now uses the plain full name Shyam Rathore, with no asterisk or decorative wordmark. Reading pages use a quiet white text surface and 16–17px body text so the animated page background does not reduce legibility.
+The header uses the plain full name Shyam Rathore, with no asterisk or decorative wordmark. Reading pages use a quiet white text surface and 16–17px body text so the animated page background does not reduce legibility.
+
+## Aceternity cloud background
+
+The project already has `components.json` for shadcn/ui, TypeScript, Tailwind v4 and its PostCSS plugin, and the `@/lib/utils` class merger. The [Aceternity cloud demo registry](https://ui.aceternity.com/registry/cloud-shader-demo.json) and its `cloud-shader` dependency were inspected; the user's pasted source matches the registry. No extra package is required: the component uses native WebGL and existing React utilities.
+
+`components/ui/cloud-shader.tsx` retains Aceternity's billow shader with a corrected ascending-edge haze smoothstep. The reusable demo is in `components/cloud-shader-demo.tsx`. Portfolio integration uses five white clouds, blue sky, 0.35-speed drift, 20 fps, and a 900,000-pixel rendering budget. The cloud layer occupies the upper 720px (90svh on smaller screens) and fades vertically. The ASCII texture sits above the clouds so it remains visible instead of being covered by the sky. A shared pause control stops both clouds and ASCII. The shader stops scheduling animation when paused, offscreen, hidden, reduced-motion is enabled, or its context is lost. A CSS sky remains if WebGL is unavailable.
+
+Both layers fade toward the measured content column. Cloud opacity is 1 at the edges and at most 0.2 under text; ASCII opacity is 0.16 at the edges and about 0.053 under text; the original white article/case-study reading surfaces remain. Clouds stay more visible at the edges. The sky footer remains the user's halftone artwork. No browser/computer use was performed for this addition.
+
+## Background continuity during the black-hole interaction
+
+The capture now freezes the ambient layers, asks WebGL canvases to paint/copy synchronously before their buffers clear, and rasterizes the current clouds and ASCII video with the same opacity, masks, and screen/invert treatment used by CSS. The page is captured with a transparent base. A fresh opaque Canvas 2D bitmap is filled white, then receives the background and foreground in order; html2canvas's drawing context is never reused. No images or layout changes are injected into html2canvas's clone. This avoids its missing WebGL/video-filter/mask support without letting optional decorations cancel the animation. Video uses anonymous CORS; the media server's response allows cross-origin reads. Mask parameters are shared through CSS variables.
+
+The cloud canvas inherits visibility instead of explicitly forcing itself visible. The consumed page additionally hides that canvas, and the quiet dialog becomes opaque white immediately. This prevents clouds from painting through the hidden page during the scene handoff. The desk module is prefetched while the page capture is prepared. Restore clears both capture and consumed classes.

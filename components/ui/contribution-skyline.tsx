@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { Box, Grid2X2 } from "lucide-react"
 
 /**
  * Contribution Skyline — a year of activity as a GitHub-style heat map that
@@ -315,22 +316,6 @@ const quadPath = (ctx: CanvasRenderingContext2D, p: Float32Array, o: number, r: 
   }
   ctx.closePath()
 }
-
-const GridIcon = () => (
-  <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style={{ maxWidth: "none" }}>
-    <rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1" fill="currentColor" />
-    <rect x="9" y="1.5" width="5.5" height="5.5" rx="1" fill="currentColor" />
-    <rect x="1.5" y="9" width="5.5" height="5.5" rx="1" fill="currentColor" />
-    <rect x="9" y="9" width="5.5" height="5.5" rx="1" fill="currentColor" />
-  </svg>
-)
-
-const CubeIcon = () => (
-  <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style={{ maxWidth: "none" }}>
-    <path d="M8 1.2 14.2 4.6v6.8L8 14.8 1.8 11.4V4.6Z" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-    <path d="M1.8 4.6 8 8l6.2-3.4M8 8v6.8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-  </svg>
-)
 
 const MUTED = "var(--muted, #5e6875)"
 
@@ -1120,7 +1105,7 @@ export default function ContributionSkyline({
     engine.current?.retheme()
   }, [palette])
 
-  // The tooltip's width is needed to keep it inside the card; measure it when its text changes.
+  // The tooltip's width is needed to keep it inside the chart; measure it when its text changes.
   React.useLayoutEffect(() => {
     const tip = tipRef.current
     if (tip && active >= 0) engine.current?.tipWidth(tip.offsetWidth)
@@ -1153,12 +1138,12 @@ export default function ContributionSkyline({
       ref={rootRef}
       className={"contribution-skyline relative w-full font-sans " + className}
       style={{
-        background: "var(--color-background, #ffffff)",
+        background: "transparent",
         color: "var(--color-foreground, #171717)",
         borderColor: "var(--color-border, #e5e5e5)",
       }}
     >
-      <header className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+      <header className="skyline-heading">
         <h3 className="m-0 text-[15px] font-normal leading-snug">
           {title ?? (
             <>
@@ -1167,44 +1152,23 @@ export default function ContributionSkyline({
           )}
         </h3>
         {showToggle && (
-          <div
-            role="group"
-            aria-label="Chart view"
-            className="relative inline-flex rounded-md border p-0.5"
-            style={{ borderColor: "var(--color-border, #e5e5e5)" }}
+          <button
+            type="button"
+            className="skyline-view-toggle"
+            aria-label="Show contributions in 3D"
+            aria-pressed={is3d}
+            onClick={() => setView(is3d ? "2d" : "3d")}
           >
-            <span
-              aria-hidden="true"
-              className="absolute top-0.5 bottom-0.5 left-0.5 w-11 rounded transition-transform duration-500 motion-reduce:transition-none"
-              style={{
-                background: "var(--color-foreground, #171717)",
-                transform: is3d ? "translateX(100%)" : "translateX(0)",
-                transitionTimingFunction: ease,
-              }}
-            />
-            {(["2d", "3d"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                aria-pressed={view === v}
-                aria-label={v === "2d" ? "Flat heat map" : "3D skyline"}
-                title={v === "2d" ? "Flat heat map" : "3D skyline"}
-                onClick={() => setView(v)}
-                className="relative z-10 grid h-11 w-11 cursor-pointer place-items-center rounded border-0 bg-transparent p-0 transition-colors duration-500 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none"
-                style={{
-                  color: view === v ? "var(--color-background, #ffffff)" : MUTED,
-                  outlineColor: "var(--color-foreground, #171717)",
-                }}
-              >
-                {v === "2d" ? <GridIcon /> : <CubeIcon />}
-              </button>
-            ))}
-          </div>
+            {is3d
+              ? <Grid2X2 size={14} aria-hidden="true" />
+              : <Box size={14} aria-hidden="true" />}
+            <span>{is3d ? "View flat" : "View in 3D"}</span>
+          </button>
         )}
       </header>
 
-      <div className="skyline-chart relative" style={{ borderColor: "var(--color-border, #e5e5e5)" }}>
-        <div className="relative px-3 pt-3 sm:px-4 sm:pt-4">
+      <div className="skyline-chart relative">
+        <div className="skyline-stage relative">
           <div
             ref={stageRef}
             className="relative w-full overflow-hidden rounded-md outline-offset-4 has-[:focus-visible]:outline-2"
@@ -1260,7 +1224,7 @@ export default function ContributionSkyline({
             ref={tipRef}
             role="tooltip"
             aria-hidden={active < 0}
-            className="pointer-events-none absolute top-3 left-3 z-20 whitespace-nowrap rounded-md px-2.5 py-1.5 text-[12px] leading-none shadow-lg transition-opacity duration-150 sm:top-4 sm:left-4 motion-reduce:transition-none"
+            className="pointer-events-none absolute top-0 left-0 z-20 whitespace-nowrap rounded-md px-2.5 py-1.5 text-[12px] leading-none shadow-lg transition-opacity duration-150 motion-reduce:transition-none"
             style={{
               opacity: active >= 0 ? 1 : 0,
               background: "var(--color-foreground, #171717)",

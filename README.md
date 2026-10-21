@@ -55,6 +55,8 @@ npm run github:sync
 
 Commit and redeploy to update the graph and profile totals. For hourly server-side contribution refresh, set optional server-only `GITHUB_TOKEN` before building. Requests fall back to the dated snapshot on failure. Profile stars and repository counts use the dated snapshot until the next CLI sync. No token enters the browser. `/api/github` serves the contribution data. Both snapshots work without credentials.
 
+The supplied Contribution Skyline renders the same server-provided calendar on Home (26 weeks) and About (53 weeks). It starts as a flat heat map, with an optional 3D skyline and drag/keyboard controls. Colors match the portfolio and preserve GitHub’s contribution levels. No generated sample activity is used. The chart respects reduced motion and stops its animation loop when the tab is hidden; the source/snapshot date remains visible.
+
 ## Hosting and metadata
 
 Set `SITE_URL` to the canonical address before deployment (default `https://shyam.codes`). See `.env.example`. It controls RSS, metadata, robots, and sitemap URLs. Use a supported Next.js host. This local redesign does not alter the live website until deployed.

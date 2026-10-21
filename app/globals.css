@@ -2134,3 +2134,18 @@ em {
  .project-row-live { margin-left:88px; }
  .project-list-compact .project-row-live { margin-left:80px; }
 }
+
+/* The supplied skyline shares the GitHub data and the portfolio's blue palette. */
+.contribution-skyline {
+  --color-background: #fff;
+  --color-foreground: var(--ink);
+  --color-muted-foreground: var(--muted);
+  --color-border: var(--line);
+  min-width: 0;
+}
+.contribution-skyline > header { padding-bottom: 4px; }
+.contribution-skyline .skyline-chart { border-top: 1px solid var(--line); }
+.skyline-compact > header h3 { font-size: 11px; color: var(--muted); }
+.skyline-compact .skyline-chart > div:first-child { padding-inline: 0; }
+.skyline-compact .skyline-chart > div:last-child { padding-inline: 0; font-size: 10px; }
+.skyline-compact .skyline-chart > div:first-child > div:first-child { min-height: 68px; }

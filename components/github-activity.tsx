@@ -1,19 +1,19 @@
 import { getActivity } from "@/lib/github";
 import { ArrowUpRight } from "lucide-react";
+import ContributionSkyline from "@/components/ui/contribution-skyline";
 export async function GitHubActivity({
   compact = false,
 }: {
   compact?: boolean;
 }) {
   const activity = await getActivity();
-  const weeks = compact ? activity.weeks.slice(-26) : activity.weeks;
-  const levels: Record<string, number> = {
-    NONE: 0,
-    FIRST_QUARTILE: 1,
-    SECOND_QUARTILE: 2,
-    THIRD_QUARTILE: 3,
-    FOURTH_QUARTILE: 4,
-  };
+  const days = activity.weeks.flatMap((week) =>
+    week.contributionDays.map((day) => ({
+      date: day.date,
+      count: day.contributionCount,
+      level: { NONE: 0, FIRST_QUARTILE: 1, SECOND_QUARTILE: 2, THIRD_QUARTILE: 3, FOURTH_QUARTILE: 4 }[day.contributionLevel],
+    })),
+  );
   const updated = new Date(activity.fetchedAt).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
@@ -45,44 +45,24 @@ export async function GitHubActivity({
         </a>
       </div>
       <figure>
-        <div
-          className="contribution-scroll"
-          tabIndex={0}
-          role="region"
-          aria-label={`${compact ? "Last six months" : "Past year"} of GitHub contributions, scroll horizontally`}
-        >
-          <div
-            className="contribution-grid"
-            role="img"
-            aria-label={`${activity.totalContributions} contributions in the past year; darker blue indicates more activity.`}
-          >
-            {weeks.map((week, i) => (
-              <div className="contribution-week" key={i}>
-                {week.contributionDays.map((day) => (
-                  <span
-                    key={day.date}
-                    data-level={levels[day.contributionLevel] ?? 0}
-                    title={`${day.date}: ${day.contributionCount} contribution${day.contributionCount === 1 ? "" : "s"}`}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
+        <ContributionSkyline
+          data={days}
+          weeksToShow={compact ? 26 : 53}
+          palette={["#c7d9ef", "#88acd8", "#4e79b2", "#2d5195"]}
+          title="Daily contributions"
+          defaultView="2d"
+          showStats={!compact}
+          showLegend={!compact}
+          locale="en-GB"
+          className={compact ? "skyline-compact" : undefined}
+        />
         <figcaption>
           <span>
             {activity.source === "snapshot"
               ? "GitHub snapshot"
               : "Synced from GitHub"}{" "}
             · {updated}
-            {compact ? " · last 6 months shown" : ""}
-          </span>
-          <span className="activity-legend">
-            Less{" "}
-            {[0, 1, 2, 3, 4].map((level) => (
-              <i key={level} data-level={level} />
-            ))}{" "}
-            More
+            {compact ? " · last 26 weeks shown" : ""}
           </span>
         </figcaption>
       </figure>
